@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlinkRemove - Removedor de Fundo Gratuito e Seguro</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Background dynamic gradient elements -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+                <span class="logo-text">Slink<span class="highlight">Remove</span></span>
+            </div>
+            <p class="tagline">Remova fundos de imagens instantaneamente de forma gratuita e 100% local</p>
+            
+            <!-- PhotoRoom API Settings -->
+            <div class="api-settings-container" style="display: none;">
+                <div class="api-settings-input-wrapper">
+                    <input type="password" id="photoroom-key" placeholder="Chave da API do PhotoRoom (Opcional - Qualidade Cloud)">
+                    <i class="fa-solid fa-key api-key-icon"></i>
+                </div>
+                <a href="https://www.photoroom.com/api" target="_blank" class="api-link">Obter chave grátis <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+        </header>
+
+        <!-- Main Content App Card -->
+        <main class="app-card">
+            
+            <!-- Upload Area -->
+            <section id="upload-section" class="app-section active">
+                <div class="upload-dropzone" id="dropzone">
+                    <input type="file" id="file-input" accept="image/*" style="display: none;">
+                    <div class="upload-icon-wrapper">
+                        <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                    </div>
+                    <h2>Arraste e solte sua imagem aqui</h2>
+                    <p class="or-divider">ou</p>
+                    <button class="btn btn-primary" id="select-btn">
+                        <i class="fa-regular fa-image"></i> Escolher Arquivo
+                    </button>
+                    <p class="file-limits">Suporta PNG, JPG, JPEG, WEBP ou BMP. Máx: 16 MB.</p>
+                </div>
+            </section>
+
+            <!-- Loading / Processing Area -->
+            <section id="loading-section" class="app-section">
+                <div class="loader-wrapper">
+                    <!-- Efeito Scanner de Laser Azul do PhotoRoom -->
+                    <div class="scan-container">
+                        <img id="img-scan-preview" src="" alt="Scanning...">
+                        <div class="laser-line"></div>
+                    </div>
+                    <div class="spinner">
+                        <div class="double-bounce1"></div>
+                        <div class="double-bounce2"></div>
+                    </div>
+                    <h3 class="loader-title">Removendo o Fundo...</h3>
+                    <p class="loader-subtitle" id="loader-msg">Aguarde, estamos processando sua imagem com inteligência artificial.</p>
+                    
+                    <div class="info-alert" id="first-run-alert">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>Nota: A primeira execução com o modelo escolhido fará o download dele para seu PC (ex: BiRefNet tem ~970MB). Isso ocorre apenas no primeiro uso!</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Result Area -->
+            <section id="result-section" class="app-section">
+                <div class="result-container">
+                    
+                    <!-- Viewer controls -->
+                    <div class="viewer-tabs">
+                        <button class="tab-btn active" data-view="compare">
+                            <i class="fa-solid fa-arrows-left-right"></i> Comparar
+                        </button>
+                        <button class="tab-btn" data-view="original">Com Fundo</button>
+                        <button class="tab-btn" data-view="removed">Fundo Removido</button>
+                    </div>
+
+                    <!-- Visual Workspace -->
+                    <div class="workspace-viewport">
+                        <!-- Before & After Comparison Slider -->
+                        <div class="comparison-slider" id="slider-container">
+                            <img id="img-original" src="" alt="Original">
+                            
+                            <div class="resize-wrapper" id="resize-wrapper">
+                                <img id="img-result" src="" alt="Sem Fundo">
+                            </div>
+                            
+                            <div class="slider-handle" id="slider-handle">
+                                <span class="handle-arrow-left"><i class="fa-solid fa-chevron-left"></i></span>
+                                <span class="handle-line"></span>
+                                <span class="handle-arrow-right"><i class="fa-solid fa-chevron-right"></i></span>
+                            </div>
+                        </div>
+
+                        <!-- Single view Original -->
+                        <div class="single-view hidden" id="view-original">
+                            <img id="img-original-single" src="" alt="Original">
+                        </div>
+
+                        <!-- Single view Result -->
+                        <div class="single-view checkerboard-bg hidden" id="view-removed">
+                            <img id="img-result-single" src="" alt="Sem Fundo">
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-footer">
+                        <button class="btn btn-secondary" id="restart-btn">
+                            <i class="fa-solid fa-rotate-left"></i> Nova Imagem
+                        </button>
+                        <a href="#" class="btn btn-success" id="download-btn" download="slinkremove-resultado.png">
+                            <i class="fa-solid fa-download"></i> Baixar Imagem Grátis
+                        </a>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+
+        <!-- Feature Badges -->
+        <section class="features-row">
+            <div class="feature-badge">
+                <i class="fa-solid fa-shield-halved badge-icon"></i>
+                <div class="badge-text">
+                    <h4>Privacidade Total</h4>
+                    <p>Processado 100% no seu PC</p>
+                </div>
+            </div>
+            <div class="feature-badge">
+                <i class="fa-solid fa-coins badge-icon"></i>
+                <div class="badge-text">
+                    <h4>Grátis e Ilimitado</h4>
+                    <p>Sem taxas ou limites de uso</p>
+                </div>
+            </div>
+            <div class="feature-badge">
+                <i class="fa-solid fa-bolt badge-icon"></i>
+                <div class="badge-text">
+                    <h4>Alta Resolução</h4>
+                    <p>Mantém o tamanho original</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Criado com <i class="fa-solid fa-heart heart-icon"></i> usando Python, Flask & rembg</p>
+        </footer>
+    </div>
+
+    <!-- JS Logic -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
