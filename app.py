@@ -1,14 +1,8 @@
 import io
 import os
 import requests
-import numpy as np
-import scipy.ndimage as ndimage
 from flask import Flask, render_template, request, send_file, jsonify
-from rembg import remove, new_session
 from PIL import Image
-from skimage.measure import label, regionprops
-from skimage.feature import peak_local_max
-from skimage.segmentation import watershed
 
 app = Flask(__name__)
 
@@ -29,6 +23,7 @@ SUPPORTED_MODELS = {
 }
 
 def get_model_session(model_name):
+    from rembg import new_session
     if model_name not in SUPPORTED_MODELS:
         model_name = 'isnet-general-use' # default para alta precisão
         
@@ -41,6 +36,10 @@ def get_model_session(model_name):
     return MODEL_SESSIONS[real_model_name]
 
 def keep_foreground_components(a_channel, mask_human=None, auto_focus=True):
+    import numpy as np
+    import scipy.ndimage as ndimage
+    from skimage.measure import label, regionprops
+
     # Converte o canal alpha (PIL L) para uma máscara binária NumPy
     mask = np.array(a_channel) > 0
     
@@ -228,6 +227,9 @@ def remove_background():
                 app.logger.error(f"Falha ao conectar na API do PhotoRoom: {str(api_err)}. Ativando fallback local.")
 
         # Obter sessão do modelo correspondente (Fallback Local)
+        from rembg import remove
+        import numpy as np
+
         session = get_model_session(model_name)
         
         # Obter sessão do modelo humano para segmentação e identificação de pessoas

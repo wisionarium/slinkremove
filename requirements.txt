@@ -1,3 +1,3 @@
 Flask
-rembg[cpu]
+requests
 Pillow
