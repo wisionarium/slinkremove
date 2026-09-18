@@ -1,3 +1,7 @@
 Flask
 requests
 Pillow
+rembg
+numpy
+scipy
+scikit-image
